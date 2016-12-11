@@ -4,7 +4,7 @@
 #
 Name     : libXxf86dga
 Version  : 1.1.4
-Release  : 3
+Release  : 4
 URL      : https://www.x.org/releases/individual/lib/libXxf86dga-1.1.4.tar.gz
 Source0  : https://www.x.org/releases/individual/lib/libXxf86dga-1.1.4.tar.gz
 Summary  : XFree86 Direct Graphics Access Extension Library
@@ -12,6 +12,17 @@ Group    : Development/Tools
 License  : MIT
 Requires: libXxf86dga-lib
 Requires: libXxf86dga-doc
+BuildRequires : gcc-dev32
+BuildRequires : gcc-libgcc32
+BuildRequires : gcc-libstdc++32
+BuildRequires : glibc-dev32
+BuildRequires : glibc-libc32
+BuildRequires : pkgconfig(32x11)
+BuildRequires : pkgconfig(32xext)
+BuildRequires : pkgconfig(32xextproto)
+BuildRequires : pkgconfig(32xf86dgaproto)
+BuildRequires : pkgconfig(32xorg-macros)
+BuildRequires : pkgconfig(32xproto)
 BuildRequires : pkgconfig(x11)
 BuildRequires : pkgconfig(xext)
 BuildRequires : pkgconfig(xextproto)
@@ -34,6 +45,15 @@ Provides: libXxf86dga-devel
 dev components for the libXxf86dga package.
 
 
+%package dev32
+Summary: dev32 components for the libXxf86dga package.
+Group: Default
+Requires: libXxf86dga-lib32
+
+%description dev32
+dev32 components for the libXxf86dga package.
+
+
 %package doc
 Summary: doc components for the libXxf86dga package.
 Group: Documentation
@@ -50,14 +70,31 @@ Group: Libraries
 lib components for the libXxf86dga package.
 
 
+%package lib32
+Summary: lib32 components for the libXxf86dga package.
+Group: Default
+
+%description lib32
+lib32 components for the libXxf86dga package.
+
+
 %prep
 %setup -q -n libXxf86dga-1.1.4
+pushd ..
+cp -a libXxf86dga-1.1.4 build32
+popd
 
 %build
 export LANG=C
 %configure --disable-static
 make V=1  %{?_smp_mflags}
 
+pushd ../build32/
+export CFLAGS="$CFLAGS -m32"
+export CXXFLAGS="$CXXFLAGS -m32"
+%configure --disable-static  --libdir=/usr/lib32 --build=i686-generic-linux-gnu --host=i686-generic-linux-gnu --target=i686-clr-linux-gnu
+make V=1  %{?_smp_mflags}
+popd
 %check
 export LANG=C
 export http_proxy=http://127.0.0.1:9/
@@ -67,6 +104,15 @@ make VERBOSE=1 V=1 %{?_smp_mflags} check
 
 %install
 rm -rf %{buildroot}
+pushd ../build32/
+%make_install32
+if [ -d  %{buildroot}/usr/lib32/pkgconfig ]
+then
+pushd %{buildroot}/usr/lib32/pkgconfig
+for i in *.pc ; do mv $i 32$i ; done
+popd
+fi
+popd
 %make_install
 
 %files
@@ -79,6 +125,11 @@ rm -rf %{buildroot}
 /usr/lib64/libXxf86dga.so
 /usr/lib64/pkgconfig/xxf86dga.pc
 
+%files dev32
+%defattr(-,root,root,-)
+/usr/lib32/libXxf86dga.so
+/usr/lib32/pkgconfig/32xxf86dga.pc
+
 %files doc
 %defattr(-,root,root,-)
 %doc /usr/share/man/man3/*
@@ -87,3 +138,8 @@ rm -rf %{buildroot}
 %defattr(-,root,root,-)
 /usr/lib64/libXxf86dga.so.1
 /usr/lib64/libXxf86dga.so.1.0.0
+
+%files lib32
+%defattr(-,root,root,-)
+/usr/lib32/libXxf86dga.so.1
+/usr/lib32/libXxf86dga.so.1.0.0
