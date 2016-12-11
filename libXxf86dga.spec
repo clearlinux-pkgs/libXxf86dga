@@ -4,7 +4,7 @@
 #
 Name     : libXxf86dga
 Version  : 1.1.4
-Release  : 2
+Release  : 3
 URL      : https://www.x.org/releases/individual/lib/libXxf86dga-1.1.4.tar.gz
 Source0  : https://www.x.org/releases/individual/lib/libXxf86dga-1.1.4.tar.gz
 Summary  : XFree86 Direct Graphics Access Extension Library
@@ -54,10 +54,12 @@ lib components for the libXxf86dga package.
 %setup -q -n libXxf86dga-1.1.4
 
 %build
+export LANG=C
 %configure --disable-static
 make V=1  %{?_smp_mflags}
 
 %check
+export LANG=C
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost
@@ -74,8 +76,8 @@ rm -rf %{buildroot}
 %defattr(-,root,root,-)
 /usr/include/X11/extensions/Xxf86dga.h
 /usr/include/X11/extensions/xf86dga1.h
-/usr/lib64/*.so
-/usr/lib64/pkgconfig/*.pc
+/usr/lib64/libXxf86dga.so
+/usr/lib64/pkgconfig/xxf86dga.pc
 
 %files doc
 %defattr(-,root,root,-)
@@ -83,4 +85,5 @@ rm -rf %{buildroot}
 
 %files lib
 %defattr(-,root,root,-)
-/usr/lib64/*.so.*
+/usr/lib64/libXxf86dga.so.1
+/usr/lib64/libXxf86dga.so.1.0.0
