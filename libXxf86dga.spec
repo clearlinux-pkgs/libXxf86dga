@@ -4,7 +4,7 @@
 #
 Name     : libXxf86dga
 Version  : 1.1.4
-Release  : 5
+Release  : 6
 URL      : https://www.x.org/releases/individual/lib/libXxf86dga-1.1.4.tar.gz
 Source0  : https://www.x.org/releases/individual/lib/libXxf86dga-1.1.4.tar.gz
 Summary  : XFree86 Direct Graphics Access Extension Library
@@ -49,6 +49,7 @@ dev components for the libXxf86dga package.
 Summary: dev32 components for the libXxf86dga package.
 Group: Default
 Requires: libXxf86dga-lib32
+Requires: libXxf86dga-dev
 
 %description dev32
 dev32 components for the libXxf86dga package.
@@ -85,31 +86,42 @@ cp -a libXxf86dga-1.1.4 build32
 popd
 
 %build
+export http_proxy=http://127.0.0.1:9/
+export https_proxy=http://127.0.0.1:9/
+export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
+export SOURCE_DATE_EPOCH=1500993523
+export CFLAGS="$CFLAGS -Os -fdata-sections -ffunction-sections -fno-semantic-interposition "
+export FCFLAGS="$CFLAGS -Os -fdata-sections -ffunction-sections -fno-semantic-interposition "
+export FFLAGS="$CFLAGS -Os -fdata-sections -ffunction-sections -fno-semantic-interposition "
+export CXXFLAGS="$CXXFLAGS -Os -fdata-sections -ffunction-sections -fno-semantic-interposition "
 %configure --disable-static
 make V=1  %{?_smp_mflags}
 
 pushd ../build32/
+export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
 export CFLAGS="$CFLAGS -m32"
 export CXXFLAGS="$CXXFLAGS -m32"
-%configure --disable-static  --libdir=/usr/lib32 --build=i686-generic-linux-gnu --host=i686-generic-linux-gnu --target=i686-clr-linux-gnu
+export LDFLAGS="$LDFLAGS -m32"
+%configure --disable-static    --libdir=/usr/lib32 --build=i686-generic-linux-gnu --host=i686-generic-linux-gnu --target=i686-clr-linux-gnu
 make V=1  %{?_smp_mflags}
 popd
 %check
 export LANG=C
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
-export no_proxy=localhost
+export no_proxy=localhost,127.0.0.1,0.0.0.0
 make VERBOSE=1 V=1 %{?_smp_mflags} check
 
 %install
+export SOURCE_DATE_EPOCH=1500993523
 rm -rf %{buildroot}
 pushd ../build32/
 %make_install32
 if [ -d  %{buildroot}/usr/lib32/pkgconfig ]
 then
 pushd %{buildroot}/usr/lib32/pkgconfig
-for i in *.pc ; do mv $i 32$i ; done
+for i in *.pc ; do ln -s $i 32$i ; done
 popd
 fi
 popd
@@ -129,6 +141,7 @@ popd
 %defattr(-,root,root,-)
 /usr/lib32/libXxf86dga.so
 /usr/lib32/pkgconfig/32xxf86dga.pc
+/usr/lib32/pkgconfig/xxf86dga.pc
 
 %files doc
 %defattr(-,root,root,-)
