@@ -4,7 +4,7 @@
 #
 Name     : libXxf86dga
 Version  : 1.1.4
-Release  : 7
+Release  : 8
 URL      : https://www.x.org/releases/individual/lib/libXxf86dga-1.1.4.tar.gz
 Source0  : https://www.x.org/releases/individual/lib/libXxf86dga-1.1.4.tar.gz
 Summary  : XFree86 Direct Graphics Access Extension Library
