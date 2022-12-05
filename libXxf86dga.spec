@@ -5,11 +5,11 @@
 # Source0 file verified with key 0xCFDF148828C642A7 (alanc@freedesktop.org)
 #
 Name     : libXxf86dga
-Version  : 1.1.5
-Release  : 12
-URL      : https://www.x.org/releases/individual/lib/libXxf86dga-1.1.5.tar.gz
-Source0  : https://www.x.org/releases/individual/lib/libXxf86dga-1.1.5.tar.gz
-Source1  : https://www.x.org/releases/individual/lib/libXxf86dga-1.1.5.tar.gz.sig
+Version  : 1.1.6
+Release  : 13
+URL      : https://www.x.org/releases/individual/lib/libXxf86dga-1.1.6.tar.gz
+Source0  : https://www.x.org/releases/individual/lib/libXxf86dga-1.1.6.tar.gz
+Source1  : https://www.x.org/releases/individual/lib/libXxf86dga-1.1.6.tar.gz.sig
 Summary  : XFree86 Direct Graphics Access Extension Library
 Group    : Development/Tools
 License  : MIT
@@ -86,10 +86,10 @@ license components for the libXxf86dga package.
 
 
 %prep
-%setup -q -n libXxf86dga-1.1.5
-cd %{_builddir}/libXxf86dga-1.1.5
+%setup -q -n libXxf86dga-1.1.6
+cd %{_builddir}/libXxf86dga-1.1.6
 pushd ..
-cp -a libXxf86dga-1.1.5 build32
+cp -a libXxf86dga-1.1.6 build32
 popd
 
 %build
@@ -97,20 +97,20 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1604442821
+export SOURCE_DATE_EPOCH=1670224218
 export GCC_IGNORE_WERROR=1
 export AR=gcc-ar
 export RANLIB=gcc-ranlib
 export NM=gcc-nm
-export CFLAGS="$CFLAGS -O3 -Os -fdata-sections -ffat-lto-objects -ffunction-sections -flto=4 -fno-semantic-interposition "
-export FCFLAGS="$FFLAGS -O3 -Os -fdata-sections -ffat-lto-objects -ffunction-sections -flto=4 -fno-semantic-interposition "
-export FFLAGS="$FFLAGS -O3 -Os -fdata-sections -ffat-lto-objects -ffunction-sections -flto=4 -fno-semantic-interposition "
-export CXXFLAGS="$CXXFLAGS -O3 -Os -fdata-sections -ffat-lto-objects -ffunction-sections -flto=4 -fno-semantic-interposition "
+export CFLAGS="$CFLAGS -O3 -Os -fdata-sections -ffat-lto-objects -ffunction-sections -flto=auto -fno-semantic-interposition "
+export FCFLAGS="$FFLAGS -O3 -Os -fdata-sections -ffat-lto-objects -ffunction-sections -flto=auto -fno-semantic-interposition "
+export FFLAGS="$FFLAGS -O3 -Os -fdata-sections -ffat-lto-objects -ffunction-sections -flto=auto -fno-semantic-interposition "
+export CXXFLAGS="$CXXFLAGS -O3 -Os -fdata-sections -ffat-lto-objects -ffunction-sections -flto=auto -fno-semantic-interposition "
 %configure --disable-static
 make  %{?_smp_mflags}
 
 pushd ../build32/
-export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
+export PKG_CONFIG_PATH="/usr/lib32/pkgconfig:/usr/share/pkgconfig"
 export ASFLAGS="${ASFLAGS}${ASFLAGS:+ }--32"
 export CFLAGS="${CFLAGS}${CFLAGS:+ }-m32 -mstackrealign"
 export CXXFLAGS="${CXXFLAGS}${CXXFLAGS:+ }-m32 -mstackrealign"
@@ -128,15 +128,21 @@ cd ../build32;
 make %{?_smp_mflags} check || :
 
 %install
-export SOURCE_DATE_EPOCH=1604442821
+export SOURCE_DATE_EPOCH=1670224218
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/libXxf86dga
-cp %{_builddir}/libXxf86dga-1.1.5/COPYING %{buildroot}/usr/share/package-licenses/libXxf86dga/669dfab6308e814f23c524fd51f565a39536ec21
+cp %{_builddir}/libXxf86dga-%{version}/COPYING %{buildroot}/usr/share/package-licenses/libXxf86dga/669dfab6308e814f23c524fd51f565a39536ec21
 pushd ../build32/
 %make_install32
 if [ -d  %{buildroot}/usr/lib32/pkgconfig ]
 then
 pushd %{buildroot}/usr/lib32/pkgconfig
+for i in *.pc ; do ln -s $i 32$i ; done
+popd
+fi
+if [ -d %{buildroot}/usr/share/pkgconfig ]
+then
+pushd %{buildroot}/usr/share/pkgconfig
 for i in *.pc ; do ln -s $i 32$i ; done
 popd
 fi
